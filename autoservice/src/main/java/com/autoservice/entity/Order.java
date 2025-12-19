@@ -16,7 +16,7 @@ public class Order {
     @Column(name = "client_id", nullable = false)
     private Integer clientId;
 
-    @Column(name = "car_id", nullable = false)  // Добавляем поле carId
+    @Column(name = "car_id", nullable = false)  
     private Integer carId;
 
     @Column(name = "status", nullable = false)
@@ -31,11 +31,15 @@ public class Order {
     @Column(name = "total_cost")
     private BigDecimal totalCost;
 
+    // Добавляем поле для назначения сотрудника
+    @Column(name = "assigned_employee", nullable = false)
+    private String assignedEmployee = "Nobody";  // По умолчанию "Nobody"
+
     public Order() {
     }
 
     public Order(Integer id, Integer clientId, Integer carId, String status,
-                 LocalDateTime createdAt, LocalDateTime finishedAt, BigDecimal totalCost) {
+                 LocalDateTime createdAt, LocalDateTime finishedAt, BigDecimal totalCost, String assignedEmployee) {
         this.id = id;
         this.clientId = clientId;
         this.carId = carId;
@@ -43,8 +47,19 @@ public class Order {
         this.createdAt = createdAt;
         this.finishedAt = finishedAt;
         this.totalCost = totalCost;
+        this.assignedEmployee = assignedEmployee;  // Инициализация сотрудника
     }
 
+    // Getter и Setter для нового поля
+    public String getAssignedEmployee() {
+        return assignedEmployee;
+    }
+
+    public void setAssignedEmployee(String assignedEmployee) {
+        this.assignedEmployee = assignedEmployee;
+    }
+
+    // Оставшиеся геттеры и сеттеры
     public Integer getId() {
         return id;
     }

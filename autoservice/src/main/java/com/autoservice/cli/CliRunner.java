@@ -186,14 +186,47 @@ public class CliRunner implements CommandLineRunner {
         while (!back) {
             System.out.println("\nМеню заказов:");
             System.out.println("  1) Создать заказ");
+            System.out.println("  2) Назначить сотрудника на заказ");
+            System.out.println("  3) Список заказов");
+            System.out.println("  4) Просмотр заказа по ID");
             System.out.println("  0) Назад");
             String choice = readLine(">>> ");
             clearScreen();  // Очищаем экран после выбора
             switch (choice) {
                 case "1" -> createOrderFlow();
+                case "2" -> assignEmployeeToOrder();
+                case "3" -> listOrders();
+                case "4" -> viewOrderById();
                 case "0" -> back = true;
                 default -> System.out.println("Не понял выбор.");
             }
+        }
+    }
+
+    private void listOrders() {
+        List<Order> orders = orderService.getAllOrders();
+        System.out.println("Список заказов:");
+        for (Order order : orders) {
+            System.out.printf("ID: %d | Статус: %s | Клиент ID: %d | Авто ID: %d | Сотрудник: %s%n",
+                    order.getId(), order.getStatus(), order.getClientId(), order.getCarId(), order.getAssignedEmployee());
+        }
+    }
+
+    private void viewOrderById() {
+        Integer orderId = readIntOrNull("Введите ID заказа для просмотра: ");
+        if (orderId == null) {
+            System.out.println("Отмена просмотра заказа.");
+            return;
+        }
+
+        Optional<Order> orderOpt = orderService.getOrderById(orderId);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            System.out.println("Детали заказа:");
+            System.out.printf("ID: %d | Статус: %s | Клиент ID: %d | Авто ID: %d | Сотрудник: %s | Сумма: %s%n",
+                    order.getId(), order.getStatus(), order.getClientId(), order.getCarId(), order.getAssignedEmployee(), order.getTotalCost());
+        } else {
+            System.out.println("Заказ с таким ID не найден.");
         }
     }
 
@@ -225,7 +258,7 @@ public class CliRunner implements CommandLineRunner {
 
         // 2. Выбор автомобиля
         Integer carId;
-        List<Car> cars = carService.getAllCars();  // Добавим получение всех машин
+        List<Car> cars = carService.getAllCars();  
         System.out.println("Доступные автомобили:");
         for (Car car : cars) {
             System.out.printf("ID: %d | %s %s (%d)\n", car.getId(), car.getMake(), car.getModel(), car.getYear());
@@ -258,9 +291,27 @@ public class CliRunner implements CommandLineRunner {
             totalCost = BigDecimal.ZERO;
         }
 
-        // 5. Создание заказа
-        Order order = orderService.createSimpleOrder(clientId, status, totalCost, carId);
+        // 5. Назначение сотрудника (по умолчанию "Nobody")
+        String assignedEmployee = readLine("Назначить сотрудника (по умолчанию 'Nobody'): ");
+        if (assignedEmployee.isEmpty()) {
+            assignedEmployee = "Nobody";
+        }
+
+        // 6. Создание заказа
+        Order order = orderService.createSimpleOrder(clientId, status, totalCost, carId, assignedEmployee);
         System.out.println("Заказ успешно создан, ID заказа: " + order.getId());
+    }
+
+    private void assignEmployeeToOrder() {
+        Integer orderId = readIntOrNull("Введите ID заказа для назначения сотрудника: ");
+        if (orderId == null) {
+            System.out.println("Отмена назначения сотрудника.");
+            return;
+        }
+
+        String employeeName = readLine("Введите имя сотрудника: ");
+        orderService.assignEmployeeToOrder(orderId, employeeName);
+        System.out.println("Сотрудник " + employeeName + " назначен на заказ с ID " + orderId);
     }
 
     private BigDecimal readBigDecimalOrNull(String prompt) {

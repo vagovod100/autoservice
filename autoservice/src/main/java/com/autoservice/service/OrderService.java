@@ -22,15 +22,18 @@ public class OrderService {
         this.carService = carService;
     }
 
+    // Метод для получения всех заказов
     public List<Order> getAllOrders() {
         return repository.findAll();
     }
 
+    // Метод для получения заказа по ID
     public Optional<Order> getOrderById(Integer id) {
         return repository.findById(id);
     }
 
-    public Order createSimpleOrder(Integer clientId, String status, BigDecimal totalCost, Integer carId) {
+    // Метод для создания простого заказа с назначением сотрудника
+    public Order createSimpleOrder(Integer clientId, String status, BigDecimal totalCost, Integer carId, String assignedEmployee) {
         // Проверяем, что клиент существует
         clientService.getClientById(clientId)
                 .orElseThrow(() -> new IllegalArgumentException("Клиент с id=" + clientId + " не найден"));
@@ -45,8 +48,21 @@ public class OrderService {
         order.setStatus(status);
         order.setCreatedAt(LocalDateTime.now());
         order.setTotalCost(totalCost);
+        order.setAssignedEmployee(assignedEmployee);  // Назначаем сотрудника
 
         return repository.save(order);
+    }
+
+    // Метод для назначения сотрудника на уже существующий заказ
+    public void assignEmployeeToOrder(Integer orderId, String employeeName) {
+        Optional<Order> orderOpt = repository.findById(orderId);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            order.setAssignedEmployee(employeeName);  // Назначаем сотрудника
+            repository.save(order);  // Сохраняем изменения
+        } else {
+            throw new IllegalArgumentException("Заказ с id=" + orderId + " не найден");
+        }
     }
 }
 
