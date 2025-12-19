@@ -14,7 +14,7 @@ public class OrderService {
 
     private final OrderRepository repository;
     private final ClientService clientService;
-    private final CarService carService;  // Добавляем сервис для работы с автомобилями
+    private final CarService carService;
 
     public OrderService(OrderRepository repository, ClientService clientService, CarService carService) {
         this.repository = repository;
@@ -22,17 +22,14 @@ public class OrderService {
         this.carService = carService;
     }
 
-    // Метод для получения всех заказов
     public List<Order> getAllOrders() {
         return repository.findAll();
     }
 
-    // Метод для получения заказа по ID
     public Optional<Order> getOrderById(Integer id) {
         return repository.findById(id);
     }
 
-    // Метод для создания простого заказа с назначением сотрудника
     public Order createSimpleOrder(Integer clientId, String status, BigDecimal totalCost, Integer carId, String assignedEmployee) {
         // Проверяем, что клиент существует
         clientService.getClientById(clientId)
@@ -44,25 +41,27 @@ public class OrderService {
 
         Order order = new Order();
         order.setClientId(clientId);
-        order.setCarId(carId);  // Устанавливаем carId
+        order.setCarId(carId);
         order.setStatus(status);
         order.setCreatedAt(LocalDateTime.now());
         order.setTotalCost(totalCost);
-        order.setAssignedEmployee(assignedEmployee);  // Назначаем сотрудника
+        order.setAssignedEmployee(assignedEmployee);
 
         return repository.save(order);
     }
 
-    // Метод для назначения сотрудника на уже существующий заказ
     public void assignEmployeeToOrder(Integer orderId, String employeeName) {
-        Optional<Order> orderOpt = repository.findById(orderId);
-        if (orderOpt.isPresent()) {
-            Order order = orderOpt.get();
-            order.setAssignedEmployee(employeeName);  // Назначаем сотрудника
-            repository.save(order);  // Сохраняем изменения
-        } else {
-            throw new IllegalArgumentException("Заказ с id=" + orderId + " не найден");
-        }
+        Order order = repository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Заказ с id=" + orderId + " не найден"));
+        order.setAssignedEmployee(employeeName);
+        repository.save(order);
+    }
+
+    public void changeOrderStatus(Integer orderId, String newStatus) {
+        Order order = repository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Заказ с id=" + orderId + " не найден"));
+        order.setStatus(newStatus);
+        repository.save(order);
     }
 }
 

@@ -31,7 +31,7 @@ public class CliRunner implements CommandLineRunner {
     public void run(String... args) {
         clearScreen();  // Очищаем экран перед первым выводом
         System.out.println("=== Autoservice CLI ===");
-        System.out.println("Ништяк, прога запущена. Работай, родной.\n");
+        System.out.println("Программа запущена.\n");
 
         boolean running = true;
         while (running) {
@@ -42,7 +42,7 @@ public class CliRunner implements CommandLineRunner {
                 case "1" -> manageClients();
                 case "2" -> manageOrders();
                 case "0" -> {
-                    System.out.println("Выход. До связи 👋");
+                    System.out.println("Выход.");
                     running = false;
                 }
                 default -> System.out.println("Не понял выбор, попробуй ещё.");
@@ -189,6 +189,7 @@ public class CliRunner implements CommandLineRunner {
             System.out.println("  2) Назначить сотрудника на заказ");
             System.out.println("  3) Список заказов");
             System.out.println("  4) Просмотр заказа по ID");
+            System.out.println("  5) Изменить статус заказа");
             System.out.println("  0) Назад");
             String choice = readLine(">>> ");
             clearScreen();  // Очищаем экран после выбора
@@ -197,6 +198,7 @@ public class CliRunner implements CommandLineRunner {
                 case "2" -> assignEmployeeToOrder();
                 case "3" -> listOrders();
                 case "4" -> viewOrderById();
+                case "5" -> changeOrderStatus();
                 case "0" -> back = true;
                 default -> System.out.println("Не понял выбор.");
             }
@@ -228,6 +230,18 @@ public class CliRunner implements CommandLineRunner {
         } else {
             System.out.println("Заказ с таким ID не найден.");
         }
+    }
+
+    private void changeOrderStatus() {
+        Integer orderId = readIntOrNull("Введите ID заказа для изменения статуса: ");
+        if (orderId == null) {
+            System.out.println("Отмена изменения статуса.");
+            return;
+        }
+
+        String newStatus = readLine("Введите новый статус: ");
+        orderService.changeOrderStatus(orderId, newStatus);
+        System.out.println("Статус заказа с ID " + orderId + " изменен на " + newStatus);
     }
 
     private void createOrderFlow() {
