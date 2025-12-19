@@ -16,6 +16,9 @@ public class Order {
     @Column(name = "client_id", nullable = false)
     private Integer clientId;
 
+    @Column(name = "car_id", nullable = false)  // Добавляем поле carId
+    private Integer carId;
+
     @Column(name = "status", nullable = false)
     private String status;
 
@@ -31,10 +34,11 @@ public class Order {
     public Order() {
     }
 
-    public Order(Integer id, Integer clientId, String status,
+    public Order(Integer id, Integer clientId, Integer carId, String status,
                  LocalDateTime createdAt, LocalDateTime finishedAt, BigDecimal totalCost) {
         this.id = id;
         this.clientId = clientId;
+        this.carId = carId;
         this.status = status;
         this.createdAt = createdAt;
         this.finishedAt = finishedAt;
@@ -55,6 +59,14 @@ public class Order {
 
     public void setClientId(Integer clientId) {
         this.clientId = clientId;
+    }
+
+    public Integer getCarId() {
+        return carId;
+    }
+
+    public void setCarId(Integer carId) {
+        this.carId = carId;
     }
 
     public String getStatus() {
@@ -89,3 +101,4 @@ public class Order {
         this.totalCost = totalCost;
     }
 }
+

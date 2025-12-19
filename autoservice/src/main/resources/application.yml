@@ -2,6 +2,10 @@ server:
   port: 8080
 
 spring:
+  logging:
+    level:
+      org.hibernate.SQL: OFF
+      org.hibernate.type.descriptor.sql: OFF
   datasource:
     url: jdbc:postgresql://localhost:5432/autoservice_dev
     username: autoservice_user
@@ -11,7 +15,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate  # схема уже есть в БД, просто проверяем соответствие
-    show-sql: true
+    show-sql: false 
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
